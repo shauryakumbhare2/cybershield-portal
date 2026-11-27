@@ -1,10 +1,12 @@
 import { defineConfig, type Plugin } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-function resolveFromRoot(relPath: string): string {
-  const url = new URL(relPath, import.meta.url);
-  return decodeURIComponent(url.pathname).replace(/^\/([A-Za-z]:)/, '$1');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+function r(relPath: string): string {
+  return path.resolve(__dirname, relPath);
 }
 
 const PRODUCTION_CSP =
@@ -25,15 +27,15 @@ function productionCspPlugin(): Plugin {
 
 export default defineConfig({
   base: './',
-  root: resolveFromRoot('./frontend'),
-  publicDir: resolveFromRoot('./other-files/public'),
+  root: r('./frontend'),
+  publicDir: r('./public'),
   resolve: {
     alias: {
-      '@backend': resolveFromRoot('./backend'),
+      '@backend': r('./backend'),
     },
   },
   build: {
-    outDir: resolveFromRoot('./dist'),
+    outDir: r('./dist'),
     emptyOutDir: true,
   },
   plugins: [react(), tailwindcss(), productionCspPlugin()],
@@ -41,7 +43,7 @@ export default defineConfig({
     format: 'es',
   },
   test: {
-    root: resolveFromRoot('./'),
+    root: r('./'),
     environment: 'node',
     include: ['other-files/tests/**/*.test.ts'],
   },
